@@ -47,7 +47,7 @@ def set_antinode(pos: tuple, am: list, antenna):
 
 def part1(antenna_map: list) -> int:
     am = [list(s.strip()) for s in antenna_map]
-    count = 0
+    antinode = set()
     for i in range(len(am)):
         for j in range(len(am[i])):
             if am[i][j] not in ".#":
@@ -55,10 +55,12 @@ def part1(antenna_map: list) -> int:
                     for m in range(len(am[n])):
                         if am[n][m] == am[i][j]:
                             d = diff((i,j), (n,m))
-                            count += set_antinode((i+d[0],j+d[1]), am, am[i][j])
-                            count += set_antinode((n-d[0],m-d[1]), am, am[n][m])
+                            if set_antinode((i+d[0],j+d[1]), am, am[i][j]):
+                                antinode.add((i+d[0],j+d[1]))
+                            if set_antinode((n-d[0],m-d[1]), am, am[n][m]):
+                                antinode.add((n-d[0],m-d[1]))
     pprint([''.join(s) for s in am])
-    return count
+    return len(antinode)
 
 test_input = test.splitlines()
 print("Part 1 test:", part1(test_input), 14)
