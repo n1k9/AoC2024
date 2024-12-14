@@ -1,5 +1,6 @@
 # --- Day 8: Resonant Collinearity ---
 import utils
+from functools import reduce
 from pprint import pprint
 import doctest
 
@@ -62,9 +63,40 @@ def part1(antenna_map: list) -> int:
     pprint([''.join(s) for s in am])
     return len(antinode)
 
+
+def set_antinode2(pos: tuple, d: tuple, am: list):
+    i, j = pos
+    if d == (0,0):  
+        return
+    while 0 <= i < len(am) and 0 <= j < len(am[0]):
+        if am[i][j] == ".":
+            am[i][j] = "#"
+        i += d[0]
+        j += d[1]
+    return
+
+
+def part2(antenna_map: list) -> int:
+    am = [list(s.strip()) for s in antenna_map]
+    for i in range(len(am)):
+        for j in range(len(am[i])):
+            if am[i][j] not in ".#":
+                for n in range(i, len(am)):
+                    for m in range(len(am[n])):
+                        if am[n][m] == am[i][j]:
+                            d = diff((i,j), (n,m))
+                            set_antinode2((i, j), d, am)
+                            set_antinode2((n, m),(-d[0],-d[1]), am)
+    pprint([''.join(s) for s in am])
+    str_antinode = ''.join(reduce(lambda a, b: a+b, am, [])).replace(".","")
+    return len(str_antinode), len(am)*len(am[0]) - reduce(lambda a, b: a+b, am, []).count(".")
+
+
 test_input = test.splitlines()
 print("Part 1 test:", part1(test_input), 14)
+print("Part 2 test:", part2(test_input), 34)
+
  
 input = utils.read_file("../datas/day08.txt")
-print(input)
 print("Part 1:", part1(input))
+print("Part 2:", part2(input))
